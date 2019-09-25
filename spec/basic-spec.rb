@@ -1,0 +1,31 @@
+require 'rspec/autorun'
+require 'date'
+require_relative '../betten-börse'
+
+describe BettenBörse do
+
+  it "should not match guest to host if there is no fit" do
+    börse = BettenBörse.new(:hosts => "spec/fixtures/1-hosts.csv", :guests => "spec/fixtures/1-guests.csv")
+    assignments = börse.run_assignment
+    expect(assignments.size).to eq(0)
+  end
+
+  it "should match guest to host if there is a fit" do
+    börse = BettenBörse.new(:hosts => "spec/fixtures/2-hosts.csv", :guests => "spec/fixtures/2-guests.csv")
+    assignments = börse.run_assignment
+    expect(assignments.size).to eq(1)
+    expect(assignments.first[:start]).to eq(Date.parse('2019-10-01'))
+    expect(assignments.first[:end]).to eq(Date.parse('2019-10-05'))
+    expect(assignments.first[:guest][:name]).to eq('Sam')
+  end
+
+  it "should not over-book slots, and book first-come first-served" do
+    börse = BettenBörse.new(:hosts => "spec/fixtures/3-hosts.csv", :guests => "spec/fixtures/3-guests.csv")
+    assignments = börse.run_assignment
+    expect(assignments.size).to eq(1)
+    expect(assignments.first[:start]).to eq(Date.parse('2019-10-01'))
+    expect(assignments.first[:end]).to eq(Date.parse('2019-10-05'))
+    expect(assignments.first[:guest][:name]).to eq('Sam')
+  end
+
+end
