@@ -11,7 +11,6 @@ class BettenBörse
     end
   end
 
-
   def initialize(options)
     @hosts = BettenBörse.csv_hashes_from_file(options[:hosts])
     @guests = BettenBörse.csv_hashes_from_file(options[:guests])
@@ -53,4 +52,9 @@ class BettenBörse
 
   end
 
+end
+
+if __FILE__ == $0
+  börse = BettenBörse.new(:hosts => ARGV[0], :guests => ARGV[1])
+  puts börse.run_assignment
 end
