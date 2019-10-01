@@ -8,15 +8,50 @@ class Assignment
   end
 
   def can_host?(guest)
-    !has_guest? and date_compatible?(guest)
+    !has_guest? and date_compatible?(guest) and gender_compatible(guest)
+  end
+
+  def match_score(guest)
+    date_score(guest) + gender_score(guest)
   end
 
   def has_guest?
     !@guest.nil?
   end
 
+  def gender_score(guest)
+    if (@host[:c_bed_samegender] == 1 and guest[:c_bed_samegender] == 1)
+      1.0
+    elsif (@host[:c_bed_samegender] != 1 and guest[:c_bed_samegender] != 1 and @host[:c_bed_gender] != guest[:c_bed_gender])
+      1.0
+    else
+      0.0
+    end
+  end
+
+  def gender_compatible(guest)
+    if guest[:c_bed_samegender] == 1 or @host[:c_bed_samegender] == 1
+      guest[:c_bed_gender] == @host[:c_bed_gender]
+    else
+      true
+    end
+  end
+
+  def date_score(guest)
+    host_start_date = (@host[:c_bed_period_start].nil? ? Date.new(2019, 10, 1) : @host[:c_bed_period_start])
+    host_end_date = (@host[:c_bed_period_end].nil? ? Date.new(2019, 10, 20) : @host[:c_bed_period_end])
+    host_length = (host_end_date - host_start_date).to_i.to_f
+    return 0 if host_length == 0
+
+    guest_start_date = (guest[:c_bed_period_start].nil? ? Date.new(2019, 10, 1) : guest[:c_bed_period_start])
+    guest_end_date = (guest[:c_bed_period_end].nil? ? Date.new(2019, 10, 20) : guest[:c_bed_period_end])
+    guest_length = (guest_end_date - guest_start_date).to_i.to_f
+
+    return guest_length / host_length
+  end
+
   def date_compatible?(guest)
-   if guest[:c_bed_period_start].nil?
+    if guest[:c_bed_period_start].nil?
       false
     elsif @host[:c_bed_period_start].nil?
       false
@@ -81,6 +116,10 @@ class Assignment
     @guest[:id] if has_guest?
   end
 
+  def host_id
+    @host[:id]
+  end
+
   def to_s
     return <<-eos
 Host: #{Assignment.contact_to_s(@host)}
@@ -102,7 +141,7 @@ end
 class BettenBörse
 
   CSV::Converters[:yummy_date] = lambda do |field|
-    if field.match(/\d+\/\d+\/\d\d\d\d/)
+    if !field.nil? and field.match(/\d\d\d\d-\d\d-\d\d/)
       Date.parse(field)
     else
       field
@@ -123,10 +162,13 @@ class BettenBörse
   end
 
   def book_slot(slots, guest)
-    booking = slots.detect do |slot|
-      slot.can_host?(guest)
+    potential_slots = slots.select { |s| s.can_host?(guest) }
+    scores = potential_slots.collect { |s| s.match_score(guest) }
+    scored_slots = scores.zip(potential_slots)
+    ranked_slots = scored_slots.sort { |a,b| b[0] <=> a[0] }
+    if ranked_slots.size > 0
+      ranked_slots.first.last.book_slot_for_guest(guest)
     end
-    booking.book_slot_for_guest(guest) unless booking.nil?
   end
 
   def extract_assignments(slots)
@@ -168,7 +210,7 @@ class BettenBörse
   class << self
 
     def csv_hashes_from_file(file)
-      hash = CSV.new(File.read(file), :headers => true, :header_converters => :symbol, :converters => [ :all, :yummy_date ])
+      hash = CSV.new(File.read(file), :headers => true, :header_converters => :symbol, :converters => [ :numeric, :yummy_date ])
       hash.to_a.map { |row| row.to_hash }
     end
 
