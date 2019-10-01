@@ -26,25 +26,7 @@ class BettenBörse
 
   def book_slot(slots, guest)
     booking = slots.detect do |slot|
-      if guest[:c_bed_period_start].nil?
-        false
-      elsif slot[:start].nil?
-        false
-      elsif guest[:c_bed_period_start] >= slot[:start]
-        if guest[:c_bed_period_end].nil? and slot[:end].nil?
-          slot[:guest].nil?
-        elsif guest[:c_bed_period_end].nil?
-          false
-        else
-          if slot[:end].nil? or (guest[:c_bed_period_end] <= slot[:end])
-            slot[:guest].nil?
-          else
-            false
-          end
-        end
-      else
-        false
-      end
+      BettenBörse.date_compatible(slot, guest) and slot[:guest].nil?
     end
     booking[:guest] = guest unless booking.nil?
   end
@@ -62,6 +44,28 @@ class BettenBörse
   end
 
   class << self
+
+    def date_compatible(slot, guest)
+     if guest[:c_bed_period_start].nil?
+        false
+      elsif slot[:start].nil?
+        false
+      elsif guest[:c_bed_period_start] >= slot[:start]
+        if guest[:c_bed_period_end].nil? and slot[:end].nil?
+          true
+        elsif guest[:c_bed_period_end].nil?
+          false
+        else
+          if slot[:end].nil? or (guest[:c_bed_period_end] <= slot[:end])
+            true
+          else
+            false
+          end
+        end
+      else
+        false
+      end
+    end
 
     def csv_hashes_from_file(file)
       hash = CSV.new(File.read(file), :headers => true, :header_converters => :symbol, :converters => [ :all, :yummy_date ])
