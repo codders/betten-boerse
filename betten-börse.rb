@@ -19,14 +19,32 @@ class BettenBörse
   def create_slots
     slots = []
     @hosts.each do |host|
-      slots << { :start => host[:c_bed_period_start], :end => host[:c_bed_period_end] }
+      slots << { :start => host[:c_bed_period_start], :end => host[:c_bed_period_end], :id => host[:id] } unless host[:c_bed_period_start].nil?
     end
     slots
   end
 
   def book_slot(slots, guest)
     booking = slots.detect do |slot|
-      guest[:c_bed_period_start] >= slot[:start] and guest[:c_bed_period_end] <= slot[:end] and slot[:guest].nil?
+      if guest[:c_bed_period_start].nil?
+        false
+      elsif slot[:start].nil?
+        false
+      elsif guest[:c_bed_period_start] >= slot[:start]
+        if guest[:c_bed_period_end].nil? and slot[:end].nil?
+          slot[:guest].nil?
+        elsif guest[:c_bed_period_end].nil?
+          false
+        else
+          if slot[:end].nil? or (guest[:c_bed_period_end] <= slot[:end])
+            slot[:guest].nil?
+          else
+            false
+          end
+        end
+      else
+        false
+      end
     end
     booking[:guest] = guest unless booking.nil?
   end
@@ -50,11 +68,22 @@ class BettenBörse
       hash.to_a.map { |row| row.to_hash }
     end
 
+    def assignment_to_string(assignment)
+      return <<-eos
+Host: #{assignment[:id]}
+Period: #{assignment[:guest][:c_bed_period_start]} to #{assignment[:guest][:c_bed_period_end]}
+Guest: #{assignment[:guest][:id]}
+eos
+    end
+
   end
 
 end
 
 if __FILE__ == $0
   börse = BettenBörse.new(:hosts => ARGV[0], :guests => ARGV[1])
-  puts börse.run_assignment
+  börse.run_assignment.each do |assignment|
+    puts BettenBörse.assignment_to_string(assignment)
+    puts "---"
+  end
 end
