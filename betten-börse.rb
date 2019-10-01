@@ -19,14 +19,14 @@ class BettenBörse
   def create_slots
     slots = []
     @hosts.each do |host|
-      slots << { :start => host[:c_host_period_start], :end => host[:c_host_period_end] }
+      slots << { :start => host[:c_bed_period_start], :end => host[:c_bed_period_end] }
     end
     slots
   end
 
   def book_slot(slots, guest)
     booking = slots.detect do |slot|
-      guest[:c_guest_period_start] >= slot[:start] and guest[:c_guest_period_end] <= slot[:end] and slot[:guest].nil?
+      guest[:c_bed_period_start] >= slot[:start] and guest[:c_bed_period_end] <= slot[:end] and slot[:guest].nil?
     end
     booking[:guest] = guest unless booking.nil?
   end

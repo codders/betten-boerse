@@ -10,6 +10,14 @@ You will need ruby and rubygems installed on your system. Simply checkout the pr
 bundle install
 ```
 
+## Getting the data
+
+The data needs to come from a CMS system. We use Mautic for this purpose. If you have a dump of the CMS data in CSV format, and you have the `csvtool` command installed, you can run `./extract_csvs.sh` to generate host and guest CSV files
+
+```sh
+./extract_csvs.sh contacts_october-1-2019.csv
+```
+
 ## Running
 
 You need to get CSV files detailing the availability of hosts and guests. When you have these files, you can run:

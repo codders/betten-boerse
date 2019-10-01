@@ -16,7 +16,7 @@ describe BettenBörse do
     expect(assignments.size).to eq(1)
     expect(assignments.first[:start]).to eq(Date.parse('2019-10-01'))
     expect(assignments.first[:end]).to eq(Date.parse('2019-10-05'))
-    expect(assignments.first[:guest][:name]).to eq('Sam')
+    expect(assignments.first[:guest][:id]).to eq(1)
   end
 
   it "should not over-book slots, and book first-come first-served" do
@@ -25,7 +25,7 @@ describe BettenBörse do
     expect(assignments.size).to eq(1)
     expect(assignments.first[:start]).to eq(Date.parse('2019-10-01'))
     expect(assignments.first[:end]).to eq(Date.parse('2019-10-05'))
-    expect(assignments.first[:guest][:name]).to eq('Sam')
+    expect(assignments.first[:guest][:id]).to eq(1)
   end
 
 end
