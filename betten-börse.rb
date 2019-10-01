@@ -133,12 +133,36 @@ class BettenBörse
     slots.select { |s| s.has_guest? }
   end
 
+  def print_statistics(slots)
+    puts ""
+    puts "=-=-=-=- Statistics  -=-=-=-="
+    puts "Hosts: #{@hosts.size}"
+    puts "Available slots: #{slots.size}"
+    puts "Guests: #{@guests.size}"
+    puts "Slots booked: #{slots.select(&:has_guest?).size}"
+    puts "=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+  end
+
   def run_assignment
     slots = create_slots
     @guests.each do |guest|
       book_slot(slots, guest)
     end
-    extract_assignments(slots)
+    return extract_assignments(slots)
+  end
+
+  def homeless_guests(assignments)
+    homeless = []
+    homed = Hash.new
+    assignments.each do |assignment|
+      homed[assignment.guest_id] = true
+    end
+    @guests.each do |guest|
+      if !homed.has_key?(guest[:id])
+        homeless << guest
+      end
+    end
+    homeless
   end
 
   class << self
@@ -154,8 +178,15 @@ end
 
 if __FILE__ == $0
   börse = BettenBörse.new(:hosts => ARGV[0], :guests => ARGV[1])
-  börse.run_assignment.each do |assignment|
+  assignments = börse.run_assignment
+  assignments.each do |assignment|
     puts assignment
     puts "---"
+  end
+  börse.print_statistics(assignments)
+  puts ""
+  puts "Unhoused visitors:"
+  börse.homeless_guests(assignments).each do |guest|
+    puts Assignment.contact_to_s(guest)
   end
 end
