@@ -17,4 +17,16 @@ eos
   )
   end
 
+  it "should return csv-format results suitable for import to cms" do
+    börse = BettenBörse.new(:hosts => "spec/fixtures/2-hosts.csv", :guests => "spec/fixtures/2-guests.csv")
+    assignments = börse.run_assignment
+    csv_output = börse.generate_csv(assignments)
+    expect(csv_output).to eq(<<-eos
+email,c_bed_host_mail,c_bed_host_firstname,c_bed_host_lastname,c_bed_host_phone,c_bed_host_mm
+joe.bloggs@london.uk,max.mustermann@berlin.de,Max,Mustermann,01761234561,@max
+eos
+  )
+
+  end
+
 end

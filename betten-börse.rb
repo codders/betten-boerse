@@ -7,6 +7,14 @@ class Assignment
     @host = host
   end
 
+  def host
+    @host
+  end
+
+  def guest_email
+    return @guest[:email] if @guest
+  end
+
   def can_host?(guest)
     !has_guest? and date_compatible?(guest) and gender_compatible(guest) and accessibility_compatible(guest)
   end
@@ -172,6 +180,22 @@ class BettenBörse
     end
   end
 
+  CSV::Converters[:boolean_to_int] = lambda do |field|
+    if !field.nil? and field.match(/^[01]$/)
+      field == "1" ? 1 : 0
+    else
+      field
+    end
+  end
+
+  CSV::Converters[:natural_numbers] = lambda do |field|
+    if !field.nil? and field.match(/^[1-9][0-9]*$/)
+      field.to_i
+    else
+      field
+    end
+  end
+
   def initialize(options)
     @hosts = BettenBörse.csv_hashes_from_file(options[:hosts])
     @guests = BettenBörse.csv_hashes_from_file(options[:guests])
@@ -226,6 +250,16 @@ class BettenBörse
     return extract_assignments(slots)
   end
 
+  def generate_csv(assignments)
+    CSV.generate do |csv|
+      csv << [ "email", "c_bed_host_mail", "c_bed_host_firstname", "c_bed_host_lastname", "c_bed_host_phone", "c_bed_host_mm" ]
+      assignments.each do |assignment|
+        host = assignment.host
+        csv << [ assignment.guest_email, host[:email], host[:firstname], host[:lastname], host[:mobile], host[:c_mattermost_handle] ]
+      end
+    end
+  end
+
   def homeless_guests(assignments)
     homeless = []
     homed = Hash.new
@@ -243,7 +277,7 @@ class BettenBörse
   class << self
 
     def csv_hashes_from_file(file)
-      hash = CSV.new(File.read(file), :headers => true, :header_converters => :symbol, :converters => [ :numeric, :yummy_date ])
+      hash = CSV.new(File.read(file), :headers => true, :header_converters => :symbol, :converters => [ :boolean_to_int, :natural_numbers, :yummy_date ])
       hash.to_a.map { |row| row.to_hash }
     end
 
@@ -252,17 +286,40 @@ class BettenBörse
 end
 
 if __FILE__ == $0
-  börse = BettenBörse.new(:hosts => ARGV[0], :guests => ARGV[1])
+  require 'optparse'
+
+  options = {}
+  OptionParser.new do |opts|
+    opts.banner = "Usage: betten_börse.rb [options]"
+
+    opts.on("-h", "--hosts FILE", "Hosts CSV file") do |h|
+      options[:hosts] = h
+    end
+
+    opts.on("-g", "--guests FILE", "Guests CSV file") do |g|
+      options[:guests] = g
+    end
+
+    opts.on("-f", "--format FORMAT", "Output format") do |f|
+      options[:format] = f
+    end
+  end.parse!
+
+  börse = BettenBörse.new(options)
   assignments = börse.run_assignment
-  assignments.each do |assignment|
-    puts assignment
-    puts "---"
-  end
-  börse.print_statistics(assignments)
-  puts ""
-  puts "Unhoused visitors:"
-  börse.homeless_guests(assignments).each do |guest|
-    puts "#{Assignment.contact_to_s(guest)} requested #{Assignment.contact_period_to_s(guest)}"
-    puts "\t#{Assignment.matching_options(guest)}"
+  if options[:format] == "csv"
+    puts börse.generate_csv(assignments)
+  else
+    assignments.each do |assignment|
+      puts assignment
+      puts "---"
+    end
+    börse.print_statistics(assignments)
+    puts ""
+    puts "Unhoused visitors:"
+    börse.homeless_guests(assignments).each do |guest|
+      puts "#{Assignment.contact_to_s(guest)} requested #{Assignment.contact_period_to_s(guest)}"
+      puts "\t#{Assignment.matching_options(guest)}"
+    end
   end
 end
