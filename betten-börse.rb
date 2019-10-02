@@ -151,12 +151,22 @@ class BettenBörse
   def initialize(options)
     @hosts = BettenBörse.csv_hashes_from_file(options[:hosts])
     @guests = BettenBörse.csv_hashes_from_file(options[:guests])
+    @slots_by_host_email = Hash.new
   end
 
   def create_slots
     slots = []
     @hosts.each do |host|
-      slots << Assignment.new(host) unless host[:c_bed_period_start].nil?
+      if !host[:c_bed_period_start].nil?
+        new_slot = Assignment.new(host)
+        slots << new_slot
+        @slots_by_host_email[host[:email]] = new_slot
+      end
+    end
+    @guests.each do |guest|
+      if !guest[:c_bed_host_mail].nil? and @slots_by_host_email.has_key?(guest[:c_bed_host_mail])
+        @slots_by_host_email[guest[:c_bed_host_mail]].book_slot_for_guest(guest)
+      end
     end
     slots
   end
