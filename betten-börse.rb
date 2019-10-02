@@ -145,17 +145,17 @@ class Assignment
   def to_s
     return <<-eos
 Host: #{Assignment.contact_to_s(@host)} offered #{Assignment.contact_period_to_s(@host)}
-\t#{Assignment.matching_options(@host)}
+\t#{Assignment.matching_options_to_s(@host)}
 Guest: #{Assignment.contact_to_s(@guest)} requested #{Assignment.contact_period_to_s(@guest)}
-\t#{Assignment.matching_options(@guest)}
+\t#{Assignment.matching_options_to_s(@guest)}
 Booked Period: #{period_to_s}
 eos
   end
 
   class << self
 
-    def matching_options(contact)
-      "Gender: #{contact[:c_bed_gender]} Same-gender: #{contact[:c_bed_samegender]} Wheelchair Access: #{contact[:c_bed_wheelchair]}"
+    def matching_options_to_s(contact)
+      "Gender: #{contact[:c_bed_gender]} Same-gender: #{contact[:c_bed_samegender]} Wheelchair Access: #{contact[:c_bed_wheelchair]} Comment: #{contact[:c_bed_comment]}"
     end
 
     def contact_to_s(contact)
@@ -319,7 +319,7 @@ if __FILE__ == $0
     puts "Unhoused visitors:"
     börse.homeless_guests(assignments).each do |guest|
       puts "#{Assignment.contact_to_s(guest)} requested #{Assignment.contact_period_to_s(guest)}"
-      puts "\t#{Assignment.matching_options(guest)}"
+      puts "\t#{Assignment.matching_options_to_s(guest)}"
     end
   end
 end
