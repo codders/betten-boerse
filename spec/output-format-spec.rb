@@ -9,9 +9,9 @@ describe BettenBörse do
     assignments = börse.run_assignment
     expect(assignments.first.to_s).to eq(<<-eos
 Host: Max Mustermann <max.mustermann@berlin.de> (3) offered 2019-10-01 to 2019-10-05
-	Gender: m Same-gender:  Wheelchair Access:  Comment: 
+	Gender: m Same-gender:  Wheelchair Access:  Places: 1 Comment: 
 Guest: Joe Bloggs <joe.bloggs@london.uk> (1) requested 2019-10-02 to 2019-10-05
-	Gender: m Same-gender:  Wheelchair Access:  Comment: 
+	Gender: m Same-gender:  Wheelchair Access:  Places: 1 Comment: 
 Booked Period: 2019-10-02 to 2019-10-05
 eos
   )

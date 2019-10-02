@@ -16,15 +16,27 @@ class Assignment
   end
 
   def can_host?(guest)
-    !has_guest? and date_compatible?(guest) and gender_compatible(guest) and accessibility_compatible(guest)
+    !has_guest? and date_compatible?(guest) and capacity_compatible?(guest) and gender_compatible(guest) and accessibility_compatible(guest)
   end
 
   def match_score(guest)
-    date_score(guest) + gender_score(guest) + accessibility_score(guest)
+    date_score(guest) + capacity_score(guest) + gender_score(guest) + accessibility_score(guest)
   end
 
   def has_guest?
     !@guest.nil?
+  end
+
+  def capacity_score(guest)
+    hosting_capacity = Assignment.contact_capacity(@host)
+    guest_capacity = Assignment.contact_capacity(guest)
+    return guest_capacity.to_f / hosting_capacity.to_f
+  end
+
+  def capacity_compatible?(guest)
+    hosting_capacity = Assignment.contact_capacity(@host)
+    guest_capacity = Assignment.contact_capacity(guest)
+    hosting_capacity >= guest_capacity
   end
 
   def accessibility_score(guest)
@@ -154,8 +166,21 @@ eos
 
   class << self
 
+    def contact_capacity(contact)
+      places = contact[:c_bed_places]
+      if places.nil?
+        return 1
+      elsif places.class != Integer
+        return 1
+      elsif places < 1
+        return 1
+      else
+        return places
+      end
+    end
+
     def matching_options_to_s(contact)
-      "Gender: #{contact[:c_bed_gender]} Same-gender: #{contact[:c_bed_samegender]} Wheelchair Access: #{contact[:c_bed_wheelchair]} Comment: #{contact[:c_bed_comment]}"
+      "Gender: #{contact[:c_bed_gender]} Same-gender: #{contact[:c_bed_samegender]} Wheelchair Access: #{contact[:c_bed_wheelchair]} Places: #{contact[:c_bed_places]} Comment: #{contact[:c_bed_comment]}"
     end
 
     def contact_to_s(contact)
