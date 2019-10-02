@@ -179,9 +179,8 @@ class BettenBörse
     puts ""
     puts "=-=-=-=- Statistics  -=-=-=-="
     puts "Hosts: #{@hosts.size}"
-    puts "Available slots: #{slots.size}"
+    puts "Booked slots: #{slots.size}"
     puts "Guests: #{@guests.size}"
-    puts "Slots booked: #{slots.select(&:has_guest?).size}"
     puts "=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
   end
 

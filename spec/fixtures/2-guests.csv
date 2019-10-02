@@ -1,2 +1,2 @@
-id,firstname,lastname,email,phone,mobile,c_bed_places,c_bed_period_start,c_bed_period_end,c_bed_gender,c_bed_samegender,c_bed_district,c_bed_is_host
-1,Joe,Bloggs,joe.bloggs@london.uk,01234567890,01761234561,1,2019-10-02,2019-10-05,m,,,
+id,firstname,lastname,email,phone,mobile,c_mattermost_handle,c_bed_places,c_bed_period_start,c_bed_period_end,c_bed_gender,c_bed_samegender,c_bed_district,c_bed_host_firstname,c_bed_host_lastname,c_bed_host_phone,c_bed_host_mm,c_bed_is_guest
+1,Joe,Bloggs,joe.bloggs@london.uk,01234567890,01761234561,"@joe",1,2019-10-02,2019-10-05,"m",,,,,,,,1

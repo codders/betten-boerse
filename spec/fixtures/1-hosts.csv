@@ -1,3 +1,3 @@
-id,firstname,lastname,email,phone,mobile,c_bed_places,c_bed_period_start,c_bed_period_end,c_bed_gender,c_bed_samegender,c_bed_district,c_bed_is_host
-2,Max,Mustermann,max.mustermann@berlin.de,01234567890,01761234561,1,2019-10-01,2019-10-03,m,,,
-3,Max,Mustermann,max.mustermann@berlin.de,01234567890,01761234561,1,2019-10-04,2019-10-05,f,,,
+id,firstname,lastname,email,phone,mobile,c_mattermost_handle,c_bed_places,c_bed_period_start,c_bed_period_end,c_bed_gender,c_bed_samegender,c_bed_district,c_bed_is_host
+2,Max,Mustermann,max.mustermann@berlin.de,01234567890,01761234561,"@max",1,2019-10-01,2019-10-03,m,,,
+3,Max,Mustermann,max.mustermann@berlin.de,01234567890,01761234561,"@max",1,2019-10-04,2019-10-05,f,,,

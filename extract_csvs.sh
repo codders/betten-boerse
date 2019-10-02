@@ -10,9 +10,9 @@ if ! type "csvtool" > /dev/null; then
   exit 1
 fi
 
-echo "id,firstname,lastname,email,phone,mobile,c_bed_places,c_bed_period_start,c_bed_period_end,c_bed_gender,c_bed_samegender,c_bed_district,c_bed_is_host" > hosts.csv
-csvtool format '%(1),"%(5)","%(6)","%(9)","%(10)","%(11)",%(60),"%(61)","%(62)","%(71)",%(73),"%(64)",%(69)\n' contacts_october-1-2019.csv   | grep -vE '^,+$' | grep '1$' | sed -e 's/""//g' | sort -n >> hosts.csv
+echo "id,firstname,lastname,email,phone,mobile,c_mattermost_handle,c_bed_places,c_bed_period_start,c_bed_period_end,c_bed_gender,c_bed_samegender,c_bed_district,c_bed_is_host" > hosts.csv
+csvtool col 1,5,6,9,10,22,11,60,61,62,71,73,64,69 $1 | grep -vE '^,+$' | grep '1$' | sort -n >> hosts.csv
 
-echo "id,firstname,lastname,email,phone,mobile,c_bed_places,c_bed_period_start,c_bed_period_end,c_bed_gender,c_bed_samegender,c_bed_district,c_bed_is_guest" > guests.csv
-csvtool format '%(1),"%(5)","%(6)","%(9)","%(10)","%(11)",%(60),"%(61)","%(62)","%(71)",%(73),"%(64)",%(70)\n' contacts_october-1-2019.csv   | grep -vE '^,+$' | grep '1$' | sed -e 's/""//g' | sort -n >> guests.csv
+echo "id,firstname,lastname,email,phone,mobile,c_mattermost_handle,c_bed_places,c_bed_period_start,c_bed_period_end,c_bed_gender,c_bed_samegender,c_bed_district,c_bed_host_mail,c_bed_host_firstname,c_bed_host_lastname,c_bed_host_phone,c_bed_host_mm,c_bed_is_guest" > guests.csv
+csvtool col 1,5,6,9,10,11,22,60,61,62,71,73,64,75,76,77,78,79,70 $1 | grep -vE '^,+$' | grep '1$' | sort -n >> guests.csv
 
