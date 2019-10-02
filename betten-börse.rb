@@ -8,15 +8,29 @@ class Assignment
   end
 
   def can_host?(guest)
-    !has_guest? and date_compatible?(guest) and gender_compatible(guest)
+    !has_guest? and date_compatible?(guest) and gender_compatible(guest) and accessibility_compatible(guest)
   end
 
   def match_score(guest)
-    date_score(guest) + gender_score(guest)
+    date_score(guest) + gender_score(guest) + accessibility_score(guest)
   end
 
   def has_guest?
     !@guest.nil?
+  end
+
+  def accessibility_score(guest)
+    if (guest[:c_bed_wheelchair] == 1 and @host[:c_bed_wheelchair] == 1)
+      1.0
+    elsif (guest[:c_bed_wheelchair] != 1 and @host[:c_bed_wheelchair] != 1)
+      1.0
+    else
+      0.0
+    end
+  end
+
+  def accessibility_compatible(guest)
+    guest[:c_bed_wheelchair] != 1 or @host[:c_bed_wheelchair] == 1
   end
 
   def gender_score(guest)
