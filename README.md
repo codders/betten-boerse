@@ -23,7 +23,13 @@ The data needs to come from a CMS system. We use Mautic for this purpose. If you
 You need to get CSV files detailing the availability of hosts and guests. When you have these files, you can run:
 
 ```sh
-bundle exec ruby betten-börse.rb hosts.csv guests.csv
+bundle exec ruby betten-börse.rb --hosts hosts.csv --guests guests.csv
+```
+
+to produce a complete report. If you want data output in a format that can be imported back into Mautic, add the `--format csv` option:
+
+```sh
+bundle exec ruby betten-börse.rb --hosts hosts.csv --guests guests.csv --format csv
 ```
 
 ## Test
